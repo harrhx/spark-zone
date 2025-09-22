@@ -11,7 +11,7 @@ export async function saveLastSearch(data: StoreSearchResponse) {
     timestamp: data.timestamp,
   };
   try {
-    const res = await fetch("http://localhost:5000/api/search-history", {
+  const res = await fetch("https://backendmaps-8hpu.onrender.com/api/search-history", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -39,7 +39,7 @@ export function useSearchHistory(refresh?: number) {
   // Fetch history from backend
   async function fetchHistory() {
     try {
-      const res = await fetch("http://localhost:5000/api/search-history");
+  const res = await fetch("https://backendmaps-8hpu.onrender.com/api/search-history");
       if (!res.ok) throw new Error("Failed to fetch history");
       const data = await res.json();
       setHistory(data);
@@ -50,14 +50,14 @@ export function useSearchHistory(refresh?: number) {
   useEffect(() => { fetchHistory(); }, [refresh]);
   // Clear all history (delete all entries)
   const clearHistory = async () => {
-    await Promise.all(history.map((item) => fetch(`http://localhost:5000/api/search-history/${item._id}`, { method: "DELETE" })));
+  await Promise.all(history.map((item) => fetch(`https://backendmaps-8hpu.onrender.com/api/search-history/${item._id}`, { method: "DELETE" })));
     setHistory([]);
   };
   // Delete a specific entry by id
   const deleteHistoryAt = async (idx: number) => {
     const entry = history[idx];
     if (!entry || !entry._id) return;
-    await fetch(`http://localhost:5000/api/search-history/${entry._id}`, { method: "DELETE" });
+  await fetch(`https://backendmaps-8hpu.onrender.com/api/search-history/${entry._id}`, { method: "DELETE" });
     setHistory(history.filter((_, i) => i !== idx));
   };
   return { history, clearHistory, deleteHistoryAt };
