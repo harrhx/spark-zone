@@ -7,7 +7,7 @@ async function fetchStores(q: StoreSearchQuery): Promise<StoreSearchResponse> {
     type: q.type,
     minRating: String(q.minRating),
   });
-  const res = await fetch(`https://backendmaps-8hpu.onrender.com/api/stores?${params.toString()}`);
+  const res = await fetch(`/api/stores?${params.toString()}`);
   if (!res.ok) throw new Error("Failed to fetch stores");
   return (await res.json()) as StoreSearchResponse;
 }
