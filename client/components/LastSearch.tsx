@@ -36,36 +36,51 @@ import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 
 export function useSearchHistory(refresh?: number) {
   const [history, setHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   // Fetch history from backend
   async function fetchHistory() {
+    setLoading(true);
     try {
-  const res = await fetch("https://backendmaps-8hpu.onrender.com/api/search-history");
+      const res = await fetch("https://backendmaps-8hpu.onrender.com/api/search-history");
       if (!res.ok) throw new Error("Failed to fetch history");
       const data = await res.json();
       setHistory(data);
     } catch {
       setHistory([]);
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(() => { fetchHistory(); }, [refresh]);
   // Clear all history (delete all entries)
   const clearHistory = async () => {
-  await Promise.all(history.map((item) => fetch(`https://backendmaps-8hpu.onrender.com/api/search-history/${item._id}`, { method: "DELETE" })));
+    await Promise.all(history.map((item) => fetch(`https://backendmaps-8hpu.onrender.com/api/search-history/${item._id}`, { method: "DELETE" })));
     setHistory([]);
   };
   // Delete a specific entry by id
   const deleteHistoryAt = async (idx: number) => {
     const entry = history[idx];
     if (!entry || !entry._id) return;
-  await fetch(`https://backendmaps-8hpu.onrender.com/api/search-history/${entry._id}`, { method: "DELETE" });
+    await fetch(`https://backendmaps-8hpu.onrender.com/api/search-history/${entry._id}`, { method: "DELETE" });
     setHistory(history.filter((_, i) => i !== idx));
   };
-  return { history, clearHistory, deleteHistoryAt };
+  return { history, clearHistory, deleteHistoryAt, loading };
 }
 
 export function LastSearchCard({ refresh }: { refresh?: number }) {
-  const { history, clearHistory, deleteHistoryAt } = useSearchHistory(refresh);
+  const { history, clearHistory, deleteHistoryAt, loading } = useSearchHistory(refresh);
   const [expanded, setExpanded] = useState<number | null>(null);
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <svg className="animate-spin h-6 w-6 text-blue-600 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+        </svg>
+        <span className="text-muted-foreground text-sm">Loading search history…</span>
+      </div>
+    );
+  }
   if (!history.length) return <div className="text-muted-foreground text-sm">No search history yet.</div>;
   return (
     <div>

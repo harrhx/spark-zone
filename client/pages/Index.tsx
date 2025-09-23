@@ -7,10 +7,12 @@ import type { StoreSearchQuery } from "@shared/api";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { LastSearchCard } from "@/components/LastSearch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 export default function Index() {
   const [formValues, setFormValues] = useState<SearchValues | null>(null);
   const [historyRefresh, setHistoryRefresh] = useState(0);
   const [pendingSearch, setPendingSearch] = useState<SearchValues | null>(null);
+  const [showNotice, setShowNotice] = useState(true);
 
   const query: StoreSearchQuery | null = useMemo(() => {
     if (!formValues) return null;
@@ -46,6 +48,19 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-accent to-background">
+      {/* Info Button (aligned with header, high visibility) */}
+        {/* Info Button (now inside header for perfect alignment) */}
+      <Dialog open={showNotice} onOpenChange={setShowNotice}>
+        <DialogContent aria-describedby="site-notice-desc">
+          <DialogHeader>
+            <DialogTitle>Notice</DialogTitle>
+            <DialogDescription id="site-notice-desc">
+              Please note: It may take a moment for the website to become fully responsive if it has been inactive.<br />
+              Additionally, your search data is stored in MongoDB and can be accessed via the <b>Show History</b> tab. Accessing your search history may also take some time if the backend has been inactive.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
       <Sheet>
         <header className="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
           <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -54,6 +69,18 @@ export default function Index() {
               <span className="text-lg tracking-tight">Store Finder</span>
             </a>
             <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowNotice(true)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white shadow-lg border-2 border-white transition-colors duration-200 hover:bg-blue-700 focus:bg-blue-800 focus:outline-none animate-pulse mr-1"
+                  title="Information"
+                  aria-label="Show information about site responsiveness and history"
+                  style={{ boxShadow: '0 2px 12px 0 rgba(0,0,0,0.14)' }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.18" />
+                    <path fill="currentColor" d="M12 8.5a1.25 1.25 0 1 0 0-2.5a1.25 1.25 0 0 0 0 2.5Zm-1 2.75a1 1 0 0 1 1-1h.01a1 1 0 0 1 1 1v4.25a1 1 0 0 1-1 1h-.01a1 1 0 0 1-1-1V11.25Z" />
+                  </svg>
+                </button>
               <SheetTrigger asChild>
                 <Button
                   variant="outline"
